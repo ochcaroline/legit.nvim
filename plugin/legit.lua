@@ -1,0 +1,3 @@
+-- legit.nvim — loaded automatically by Neovim's plugin runtime.
+-- Users configure it via require('legit').setup({}) in their init.lua.
+-- Default keymaps are registered only after setup() is called.

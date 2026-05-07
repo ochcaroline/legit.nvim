@@ -15,8 +15,9 @@ end
 
 -- Fill the legit window with `lines`.
 -- opts:
---   title   string   shown in statusline
---   on_back fn       called on <Esc>; defaults to M.close
+--   title      string   shown in statusline
+--   on_back    fn       called on <Esc>; defaults to M.close
+--   no_escape  bool     if true, don't set <Esc> binding
 -- Returns buf, win.
 function M.open(lines, opts)
 	opts = opts or {}
@@ -41,7 +42,9 @@ function M.open(lines, opts)
 	local back = opts.on_back or M.close
 	local o = { buffer = buf, nowait = true, silent = true }
 	vim.keymap.set("n", "q", M.close, o)
-	vim.keymap.set("n", "<Esc>", back, o)
+	if not opts.no_escape then
+		vim.keymap.set("n", "<Esc>", back, o)
+	end
 
 	return buf, state.win
 end

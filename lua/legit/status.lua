@@ -116,13 +116,18 @@ local function set_lines(buf, lines, file_map)
 end
 
 function M.open()
+	if window.is_open() then
+		window.close()
+		return
+	end
+
 	local lines, file_map = build()
 	if not lines then
 		vim.notify("[legit] not a git repository", vim.log.levels.ERROR)
 		return
 	end
 
-	local buf, win = window.open(lines, { title = "legit status" })
+	local buf, win = window.open(lines, { title = "legit status", no_escape = true })
 	vim.bo[buf].filetype = "legit-status"
 	apply_hl(buf, lines, file_map)
 
@@ -225,7 +230,7 @@ function M.open()
 			require("legit.diff").open(e.file)
 		end
 	end, vim.tbl_extend("force", o, { desc = "Side-by-side diff" }))
-	vim.keymap.set("n", "cc", do_commit, vim.tbl_extend("force", o, { desc = "Commit" }))
+	vim.keymap.set("n", "c", do_commit, vim.tbl_extend("force", o, { desc = "Commit" }))
 	vim.keymap.set("n", "r", refresh, vim.tbl_extend("force", o, { desc = "Refresh" }))
 end
 

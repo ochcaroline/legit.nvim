@@ -5,7 +5,7 @@ local git = require("legit.git")
 
 local HINTS = {
 	"#",
-	"# <leader>gc to commit  |  q / <Esc> to abort",
+	"# <leader>gc to commit  |  q to abort",
 }
 
 local function git_dir()
@@ -48,7 +48,7 @@ function M.open(on_done)
 		end
 	end
 
-	local buf, win = window.open(lines, { title = "legit commit", on_back = abort })
+	local buf, win = window.open(lines, { title = "legit commit", no_escape = true })
 
 	vim.bo[buf].modifiable = true
 	vim.bo[buf].buftype = "nofile"

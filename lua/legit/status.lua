@@ -120,7 +120,10 @@ function M.open()
 		window.close()
 		return
 	end
+	M._open_window()
+end
 
+function M._open_window()
 	local lines, file_map = build()
 	if not lines then
 		vim.notify("[legit] not a git repository", vim.log.levels.ERROR)
@@ -198,13 +201,13 @@ function M.open()
 			" ─────────────────────────────────────────────────",
 		}
 		vim.list_extend(hdr, diff_lines)
-		local dbuf = window.open(hdr, { title = "legit diff: " .. e.file, on_back = M.open })
+		local dbuf = window.open(hdr, { title = "legit diff: " .. e.file, on_back = M._open_window })
 		vim.bo[dbuf].filetype = "diff"
 	end
 
 	local function do_commit()
 		require("legit.commit").open(function(_)
-			M.open()
+			M._open_window()
 		end)
 	end
 

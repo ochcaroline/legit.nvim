@@ -125,6 +125,8 @@ function M.open()
 	vim.bo[buf].filetype = "legit-status"
 	apply_hl(buf, lines, file_map)
 
+	vim.wo[win].number = true
+
 	vim.api.nvim_win_set_cursor(win, { HELP_LINES + 1, 0 })
 
 	local function refresh()

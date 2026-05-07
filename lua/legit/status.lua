@@ -63,7 +63,7 @@ local function build()
 	local lines = vim.deepcopy(HELP)
 	local file_map = {} -- lnum (1-based) → entry
 
-	local function add_section(title, items, hl)
+	local function add_section(title, items, hl, section_type)
 		if #items == 0 then
 			return
 		end
@@ -71,14 +71,15 @@ local function build()
 		table.insert(lines, " " .. title)
 		for _, entry in ipairs(items) do
 			entry.section_hl = hl
+			entry.section_type = section_type
 			table.insert(lines, " " .. entry.display)
 			file_map[#lines] = entry
 		end
 	end
 
-	add_section("Staged", staged, "LegitSectionStaged")
-	add_section("Unstaged", unstaged, "LegitSectionUnstaged")
-	add_section("Untracked", untracked, "LegitSectionUntracked")
+	add_section("Staged", staged, "LegitSectionStaged", "staged")
+	add_section("Unstaged", unstaged, "LegitSectionUnstaged", "unstaged")
+	add_section("Untracked", untracked, "LegitSectionUntracked", "untracked")
 
 	if #staged == 0 and #unstaged == 0 and #untracked == 0 then
 		table.insert(lines, "  (nothing to commit, working tree clean)")
@@ -176,9 +177,16 @@ function M.open()
 		if not e then
 			return
 		end
-		local diff_lines, ok = git.diff(e.file)
+
+		if e.section_type == "untracked" then
+			vim.notify("[legit] untracked file, cannot show diff", vim.log.levels.WARN)
+			return
+		end
+
+		local staged = e.section_type == "staged"
+		local diff_lines, ok = git.diff(e.file, staged)
 		if not ok or #diff_lines == 0 then
-			diff_lines = { "  (no unstaged changes)" }
+			diff_lines = { "  (no changes)" }
 		end
 		local hdr = {
 			" Diff: " .. e.file .. "   (<Esc> back to status)",

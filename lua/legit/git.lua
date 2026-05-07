@@ -86,9 +86,13 @@ function M.diff_hunks(file)
 	return lines, ok
 end
 
-function M.diff(file)
+function M.diff(file, staged)
 	if file then
-		return run("diff -- " .. vim.fn.shellescape(file))
+		if staged then
+			return run("diff --cached -- " .. vim.fn.shellescape(file))
+		else
+			return run("diff -- " .. vim.fn.shellescape(file))
+		end
 	end
 	return run("diff")
 end

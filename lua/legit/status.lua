@@ -77,8 +77,8 @@ local function build()
 		end
 	end
 
-	add_section("Staged", staged, "LegitSectionStaged", "staged")
 	add_section("Unstaged", unstaged, "LegitSectionUnstaged", "unstaged")
+	add_section("Staged", staged, "LegitSectionStaged", "staged")
 	add_section("Untracked", untracked, "LegitSectionUntracked", "untracked")
 
 	if #staged == 0 and #unstaged == 0 and #untracked == 0 then

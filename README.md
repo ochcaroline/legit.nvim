@@ -10,10 +10,13 @@ So I built (with the help of copilot) my own thing.
 
 ## Features
 
-- **Status window** — stage, unstage, discard, diff files
-- **Blame sidebar** — left-split that syncs cursor with the edited file (toggle with `<leader>gb`)
-- **Sign column** — `▎` green (added), `▎` yellow (changed), `▁` red (deleted); updated on save/enter
-- **Log**, **Push**, **Pull**, **Rebase** via floating windows or notify
+In-nvim git status, staging, commiting, pushing etc.
+
+In-nvim git blame
+
+Replaced gitsigns.nvim with it
+
+Opinionated AF
 
 ## Setup
 

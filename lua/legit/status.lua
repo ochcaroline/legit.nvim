@@ -4,10 +4,13 @@ local window = require("legit.window")
 local git = require("legit.git")
 
 local ns = vim.api.nvim_create_namespace("legit_status")
+local current_branch = git.get_current_branch()[1]
 
 local HELP = {
 	" legit status",
 	" ─────────────────────────────────────────────────",
+	" " .. current_branch,
+	"",
 }
 local HELP_LINES = #HELP
 

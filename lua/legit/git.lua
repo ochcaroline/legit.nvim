@@ -97,4 +97,9 @@ function M.diff(file, staged)
 	return run("diff")
 end
 
+---@return string[]
+function M.get_current_branch()
+	return run("rev-parse --abbrev-ref HEAD")
+end
+
 return M

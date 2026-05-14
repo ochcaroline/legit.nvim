@@ -4,15 +4,18 @@ local window = require("legit.window")
 local git = require("legit.git")
 
 local ns = vim.api.nvim_create_namespace("legit_status")
-local current_branch = git.get_current_branch()[1]
 
-local HELP = {
-	" legit status",
-	" ─────────────────────────────────────────────────",
-	" " .. current_branch,
-	"",
-}
-local HELP_LINES = #HELP
+local function get_help()
+	local current_branch = git.get_current_branch()
+	return {
+		" legit status",
+		" ─────────────────────────────────────────────────",
+		" " .. current_branch,
+		"",
+	}
+end
+
+local HELP_LINES = 4
 
 local function letter_hl(ch)
 	if ch == "A" then
@@ -63,7 +66,7 @@ local function build()
 		end
 	end
 
-	local lines = vim.deepcopy(HELP)
+	local lines = vim.deepcopy(get_help())
 	local file_map = {} -- lnum (1-based) → entry
 
 	local function add_section(title, items, hl, section_type)

@@ -84,9 +84,20 @@ function M.refresh(bufnr)
 		return
 	end
 
+	-- Skip special buffers (oil, fugitive, etc.) with non-standard paths
+	if file:match("^%a+://") then
+		return
+	end
+
+	-- Get the directory for cwd; must be a valid directory
+	local cwd = vim.fn.fnamemodify(file, ":h")
+	if cwd == "" or cwd == "." then
+		cwd = vim.fn.getcwd()
+	end
+
 	-- Run in background so we don't block the UI.
 	vim.fn.jobstart({ "git", "diff", "HEAD", "-U0", "--", file }, {
-		cwd = vim.fn.fnamemodify(file, ":h"),
+		cwd = cwd,
 		stdout_buffered = true,
 		on_stdout = function(_, data)
 			vim.schedule(function()
@@ -102,7 +113,7 @@ function M.refresh(bufnr)
 				end
 				-- Not committed yet — diff against the index instead.
 				vim.fn.jobstart({ "git", "diff", "-U0", "--", file }, {
-					cwd = vim.fn.fnamemodify(file, ":h"),
+					cwd = cwd,
 					stdout_buffered = true,
 					on_stdout = function(_, data)
 						vim.schedule(function()

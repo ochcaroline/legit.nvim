@@ -66,6 +66,10 @@ function M.setup(opts)
 	end, "rebase")
 
 	map(km.commit, function()
+		if not require("legit.git").has_staged_files() then
+			vim.notify("[legit] no staged files to commit", vim.log.levels.WARN)
+			return
+		end
 		require("legit.commit").open()
 	end, "commit")
 

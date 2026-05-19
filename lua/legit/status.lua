@@ -10,7 +10,7 @@ local function get_help()
 	return {
 		" legit status",
 		" ─────────────────────────────────────────────────",
-		" " .. current_branch,
+		" branch: " .. current_branch,
 		"",
 	}
 end
@@ -91,7 +91,7 @@ local function build()
 		table.insert(lines, "  (nothing to commit, working tree clean)")
 	end
 
-	return lines, file_map
+	return lines, file_map, #staged
 end
 
 local function apply_hl(buf, lines, file_map)
@@ -130,7 +130,7 @@ function M.open()
 end
 
 function M._open_window()
-	local lines, file_map = build()
+	local lines, file_map, staged_count = build()
 	if not lines then
 		vim.notify("[legit] not a git repository", vim.log.levels.ERROR)
 		return
@@ -145,9 +145,10 @@ function M._open_window()
 	vim.api.nvim_win_set_cursor(win, { HELP_LINES + 1, 0 })
 
 	local function refresh()
-		local new_lines, new_map = build()
+		local new_lines, new_map, new_staged_count = build()
 		if new_lines then
 			file_map = new_map
+			staged_count = new_staged_count
 			set_lines(buf, new_lines, new_map)
 		end
 	end
@@ -212,6 +213,10 @@ function M._open_window()
 	end
 
 	local function do_commit()
+		if staged_count == 0 then
+			vim.notify("[legit] no staged files to commit", vim.log.levels.WARN)
+			return
+		end
 		require("legit.commit").open(function(_)
 			M._open_window()
 		end)

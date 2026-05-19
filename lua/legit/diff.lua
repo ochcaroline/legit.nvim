@@ -11,7 +11,10 @@ function M.open(file)
 	if not ok then
 		orig, ok = git.run("show :" .. vim.fn.shellescape(file))
 		if not ok then
-			vim.notify("[legit] no committed version found for " .. file, vim.log.levels.WARN)
+			-- Check if HEAD exists; if not, it's a fresh repo with no commits
+			local _, has_head = git.run("rev-parse --verify HEAD")
+			local msg = has_head and ("[legit] no committed version found for " .. file) or ("[legit] no commits yet in repository")
+			vim.notify(msg, vim.log.levels.WARN)
 			return
 		end
 	end

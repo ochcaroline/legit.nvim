@@ -99,7 +99,31 @@ end
 
 ---@return string
 function M.get_current_branch()
-	return run("rev-parse --abbrev-ref HEAD")[1]
+	local branch, ok = run("rev-parse --abbrev-ref HEAD")
+	if ok and branch[1] and branch[1] ~= "HEAD" then
+		return branch[1]
+	end
+	-- No commits yet or HEAD is ambiguous; try to get the branch name from symbolic-ref
+	local ref, ok2 = run("symbolic-ref --short HEAD")
+	if ok2 and ref[1] then
+		return ref[1]
+	end
+	return "(no commits)"
+end
+
+---@return boolean
+function M.has_staged_files()
+	local status_lines = M.status()
+	for _, line in ipairs(status_lines) do
+		if #line >= 4 then
+			local x = line:sub(1, 1)
+			-- If first character is not space or ?, it's a staged file
+			if x ~= " " and x ~= "?" then
+				return true
+			end
+		end
+	end
+	return false
 end
 
 return M

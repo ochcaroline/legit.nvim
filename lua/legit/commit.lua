@@ -3,10 +3,10 @@ local M = {}
 local window = require("legit.window")
 local git = require("legit.git")
 
-local HINTS = {
-	"#",
-	"# <leader>gc to commit  |  q to abort",
-}
+local function get_help()
+	local current_branch = git.get_current_branch()
+	return { "#", "# <leader>gc to commit  |  q to abort", "# " .. current_branch }
+end
 
 local function git_dir()
 	local out = vim.fn.systemlist("git rev-parse --git-dir")
@@ -39,7 +39,7 @@ function M.open(on_done)
 	-- (git recreates this file after each commit, causing unwanted persistence)
 	local lines = { "" }
 	table.insert(lines, "")
-	vim.list_extend(lines, HINTS)
+	vim.list_extend(lines, get_help())
 
 	local function abort()
 		window.close()

@@ -25,9 +25,8 @@ function M.open(lines, opts)
 	local buf = new_buf(lines)
 
 	if not (state.win and vim.api.nvim_win_is_valid(state.win)) then
-		-- Open a vertical split on the right, half the screen width.
-		local width = math.floor(vim.o.columns * 0.5)
-		vim.cmd("botright vertical " .. width .. " split")
+		local width = math.floor(vim.api.nvim_win_get_height(0) * 0.5)
+		vim.cmd("aboveleft " .. width .. " split")
 		state.win = vim.api.nvim_get_current_win()
 	end
 
@@ -37,7 +36,15 @@ function M.open(lines, opts)
 	vim.wo[state.win].relativenumber = false
 	vim.wo[state.win].signcolumn = "no"
 	vim.wo[state.win].wrap = false
-	vim.wo[state.win].statusline = "  " .. (opts.title or "legit")
+	local title = opts.title or "legit"
+	local prefix_width = vim.api.nvim_strwidth("  " .. title .. "  ")
+	vim.wo[state.win].statusline = "%#LegitBorder#  " .. title .. "  %{repeat('─', max([0, winwidth(0) - " .. prefix_width .. "]))}"
+	vim.wo[state.win].winhighlight = "StatusLine:LegitBorder,StatusLineNC:LegitBorder"
+
+	vim.api.nvim_set_hl(0, "LegitBorder", {
+		fg = "#444444",
+		bg = "NONE",
+	})
 
 	local back = opts.on_back or M.close
 	local o = { buffer = buf, nowait = true, silent = true }

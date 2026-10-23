@@ -39,6 +39,7 @@ require('legit').setup({
     log    = '<leader>gg',
     blame  = '<leader>gb',
     rebase = '<leader>gr',
+    todos  = '<leader>todo',
   },
 })
 ```
@@ -54,6 +55,7 @@ require('legit').setup({
 | `<leader>gf` | Git pull                               |
 | `<leader>gb` | Blame sidebar (toggle, cursor-synced)  |
 | `<leader>gr` | Git rebase (prompt for ref)            |
+| `<leader>todo` | Project TODO/FIXME list (quickfix)     |
 
 ## Status window keymaps
 

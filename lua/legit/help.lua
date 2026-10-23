@@ -18,6 +18,7 @@ local function build_lines()
 		("   %-18s  Git log"):format(k(km.log)),
 		("   %-18s  Git blame sidebar (toggle)"):format(k(km.blame)),
 		("   %-18s  Git rebase"):format(k(km.rebase)),
+		("   %-18s  Project TODO/FIXME list (quickfix)"):format(k(km.todos)),
 		"",
 		" Status window",
 		"   s                   Stage file under cursor",

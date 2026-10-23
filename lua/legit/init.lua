@@ -9,7 +9,9 @@ local defaults = {
 		log = "<leader>gl",
 		blame = "<leader>gb",
 		rebase = "<leader>gr",
+		todos = "<leader>todo",
 	},
+	todos = { enabled = true },
 	signs = {
 		enabled = true,
 		add = { text = "▎" },
@@ -29,6 +31,10 @@ function M.setup(opts)
 
 	if opts.signs.enabled then
 		require("legit.signs").setup(opts.signs)
+	end
+
+	if opts.todos.enabled then
+		require("legit.todos").setup()
 	end
 
 	vim.api.nvim_create_user_command("Legit", function(cmd)
@@ -61,6 +67,9 @@ function M.setup(opts)
 	map(km.blame, function()
 		require("legit.blame").open()
 	end, "blame")
+	map(km.todos, function()
+		require("legit.todos").list()
+	end, "todos")
 	map(km.rebase, function()
 		require("legit.rebase").open()
 	end, "rebase")

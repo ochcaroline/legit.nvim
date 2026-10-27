@@ -20,6 +20,8 @@ local tags = {
 	OPTIMIZE = "LegitTodoPerf",
 }
 
+local comment_prefixes = { "//", "#", "--", "/*", ";", "%", "<!--" }
+
 local groups = {
 	LegitTodoFix = { fg = "#ffffff", bg = "#e5534b", bold = true },
 	LegitTodoWarn = { fg = "#1c1c1c", bg = "#e3b341", bold = true },
@@ -41,6 +43,39 @@ local function comment_prefix(bufnr)
 	return lead ~= "" and lead or nil
 end
 
+local function has_comment_prefix(line, before, lead)
+	if lead then
+		local start = 1
+		while true do
+			local s = line:find(lead, start, true)
+			if not s or s >= before then
+				break
+			end
+			if s == 1 or line:sub(s - 1, s - 1):match("%s") then
+				return true
+			end
+			start = s + #lead
+		end
+		return false
+	end
+
+	for _, prefix in ipairs(comment_prefixes) do
+		local start = 1
+		while true do
+			local s = line:find(prefix, start, true)
+			if not s or s >= before then
+				break
+			end
+			if s == 1 or line:sub(s - 1, s - 1):match("%s") then
+				return true
+			end
+			start = s + #prefix
+		end
+	end
+	local star = line:find("*", 1, true)
+	return line:match("^%s*%*") ~= nil and star ~= nil and star < before
+end
+
 function M.refresh(bufnr)
 	if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype ~= "" then
 		return
@@ -52,7 +87,7 @@ function M.refresh(bufnr)
 	end
 	for i, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
 		local cstart = line:find(lead, 1, true)
-		if cstart then
+		if cstart and has_comment_prefix(line, cstart + 1, lead) then
 			local init = cstart + #lead
 			while true do
 				local s, e, tag = line:find("%f[%w_](%u+)%f[^%w_]", init)
@@ -95,7 +130,22 @@ function M.list()
 	local items = {}
 	for _, l in ipairs(vim.fn.systemlist(cmd)) do
 		local file, lnum, text = l:match("^(.-):(%d+):(.*)$")
-		if file then
+		local tag_start
+		if text then
+			local init = 1
+			while true do
+				local s, e, tag = text:find("%f[%w_](%u+)%f[^%w_]", init)
+				if not s then
+					break
+				end
+				if tags[tag] and has_comment_prefix(text, s) then
+					tag_start = s
+					break
+				end
+				init = e + 1
+			end
+		end
+		if file and tag_start then
 			table.insert(items, { filename = file, lnum = tonumber(lnum), text = vim.trim(text) })
 		end
 	end
@@ -107,6 +157,10 @@ function M.list()
 	vim.cmd("copen")
 
 	local buf = vim.api.nvim_get_current_buf()
+	vim.keymap.set("n", "<CR>", function()
+		vim.cmd("cc " .. vim.api.nvim_win_get_cursor(0)[1])
+		vim.cmd("cclose")
+	end, { buffer = buf, silent = true })
 	vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
 	for i, line in ipairs(vim.api.nvim_buf_get_lines(buf, 0, -1, false)) do
 		local text_start = select(2, line:find("|[^|]*|")) or 0
